@@ -1,0 +1,28 @@
+{
+  "canisters": {
+    "bc23_day_1_backend": {
+      "main": "src/bc23_day_1_backend/main.mo",
+      "type": "motoko"
+    },
+    "bc23_day_1_frontend": {
+      "dependencies": [
+        "bc23_day_1_backend"
+      ],
+      "frontend": {
+        "entrypoint": "src/bc23_day_1_frontend/src/index.html"
+      },
+      "source": [
+        "src/bc23_day_1_frontend/assets",
+        "dist/bc23_day_1_frontend/"
+      ],
+      "type": "assets"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "version": 1
+}
