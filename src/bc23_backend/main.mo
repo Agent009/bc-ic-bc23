@@ -1,30 +1,44 @@
-import Array "mo:base/Array";
-import Buffer "mo:base/Buffer";
-import Float "mo:base/Float";
-import Text "mo:base/Text";
-import Iter "mo:base/Iter";
-import Nat "mo:base/Nat";
-import Nat8 "mo:base/Nat8";
-import Nat16 "mo:base/Nat16";
-import Nat32 "mo:base/Nat32";
-import Nat64 "mo:base/Nat64";
-import { equal } "mo:base/Nat";
-import Blob "mo:base/Blob";
-import Debug "mo:base/Debug";
+import List "mo:base/List";
+import Book "./book";
+import Utils "./utils";
 
 actor {
+    public type Book = Book.Book;
+    public type List<T> = ?(T, List<T>);
+    stable var book : Book = {
+        title = "Test";
+        pages = 0;
+        read = false;
+    };
+    stable var books : List<Book> = null;
 
-    let is_array_size_even = func <T>(array : [T]) : Bool {
-        let size = array.size();
-        if (size % 2 == 0) {
-            return true;
-        } else {
-            return false;
-        };
+    // Create a book and read it before sending it back.
+    // dfx canister call bc23_backend create_and_read_book '("book1", 5)''
+    // Should return: (record { title = "book1"; read = true; pages = 10 : nat })
+    public func create_and_read_book(title: Text, pages: Nat) : async Book {
+        Book.create_book(title, pages);
     };
 
-    public query func nat_arr_size_even(array : [Nat]) : async Bool {
-        return is_array_size_even<Nat>(array);
+    // Add the new book to our list.
+    // dfx canister call bc23_backend add_book '(record {title="book1"; pages=10; read=false})'
+    // Should return: ()
+    public func add_book(book: Book) : async () {
+        books := Utils.prependToList<Book>(books, book);
     };
 
+    // Return an Array of books (not List).
+    // dfx canister call bc23_backend get_books
+    // Should return: (vec { record { title = "book1"; read = false; pages = 10 : nat } })
+    // After adding a second one (newest item prepended to the list):
+    /*
+    (
+        vec {
+            record { title = "book2"; read = false; pages = 15 : nat };
+            record { title = "book1"; read = false; pages = 10 : nat };
+        },
+    )
+    */
+    public query func get_books() : async [Book] {
+        List.toArray<Book>(books);   
+    };
 };
