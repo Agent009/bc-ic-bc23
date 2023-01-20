@@ -1,8 +1,14 @@
 import Array "mo:base/Array";
+import Bool "mo:base/Bool";
 import Buffer "mo:base/Buffer";
 import Int "mo:base/Int";
+import Hash "mo:base/Hash";
 import List "mo:base/List";
 import Option "mo:base/Option";
+import HashMap "mo:base/HashMap";
+import Iter "mo:base/Iter";
+import Order "mo:base/Order";
+import Text "mo:base/Text";
 
 module Utils {
 
@@ -40,7 +46,7 @@ module Utils {
         if (n >= xs.size()) {
             return [];
         };
-
+    
         // If we don't want to drop anything, then why did we even come here for?!
         if (n <= 0) {
             return xs;
@@ -53,11 +59,11 @@ module Utils {
         return Buffer.toArray<T>(buffer);
     };
 
-    public query func dropFromText(xs : [Text], n : Nat) : async [Text] {
+    public func dropFromText(xs : [Text], n : Nat) : [Text] {
       return drop<Text>(xs, n);
     };
 
-    public query func dropFromInt(xs : [Int], n : Nat) : async [Int] {
+    public func dropFromInt(xs : [Int], n : Nat) : [Int] {
       return drop<Int>(xs, n);
     };
 
@@ -82,4 +88,17 @@ module Utils {
     public func nat_array_even(array : [Nat]) : Bool {
         return array_even<Nat>(array);
     };
+
+    public type List<T> = ?(T, List<T>);
+    type Order = {#equal; #greater; #less};
+
+    // Challenge 1: Write a function unique that takes a list l of type List and returns a new list with all duplicate elements removed.
+    public func unique<T>(l: List<T>, equal: (t1: T, t2: T) -> Order) : List<T> {
+        let buffer = Buffer.fromArray<T>(List.toArray<T>(l));
+        Buffer.removeDuplicates<T>(buffer, equal);
+
+        return List.fromArray<T>(Buffer.toArray<T>(buffer));
+    };
+
+    
 };
